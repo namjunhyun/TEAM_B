@@ -2,10 +2,7 @@ import os
 from flask import Flask, request, jsonify, Response
 import whisper
 import openai
-import json
-
-print("OPENAI_API_KEY:", os.environ.get("OPENAI_API_KEY"))
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+import json  # 추가
 
 app = Flask(__name__)
 UPLOAD_FOLDER = "uploaded_files"
@@ -57,15 +54,14 @@ def upload_stt_summary():
         "키워드요약": summarize_text(text, "중요 키워드만 뽑아줘."),
     }
 
-    # JSON 응답에 ensure_ascii=False 옵션 넣어 한글 깨짐 방지
-    response_data = {
+    result = {
         "original_text": text,
         "summaries": summaries
     }
-    return Response(
-        json.dumps(response_data, ensure_ascii=False),
-        mimetype='application/json; charset=utf-8'
-    )
+
+    # 한글 깨짐 없이 JSON 반환
+    return Response(json.dumps(result, ensure_ascii=False), mimetype='application/json')
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
