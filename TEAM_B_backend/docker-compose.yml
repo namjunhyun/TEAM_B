@@ -1,20 +1,39 @@
 version: "3.8"
 
 services:
-  app:
-    build: .
+  stt-server:  # Flask 서버
+    build:
+      context: ./flask-stt
+    container_name: stt-server
+    ports:
+      - "5000:5000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./uploaded_files:/app/uploaded_files
+    networks:
+      - app-network
+
+  stt-backend:  # Spring Boot 서버
+    build:
+      context: .
     container_name: stt-backend
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/sttdb
+      SPRING_DATASOURCE_URL: jdbc:mysql://stt-db:3306/sttdb
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    volumes:
+      - ./uploads/audio:/app/uploads/audio
     depends_on:
-      - db
+      - stt-db
+      - stt-server
+    networks:
+      - app-network
 
-  db:
+  stt-db:  # MySQL 데이터베이스
     image: mysql:8.0
     container_name: stt-db
     ports:
@@ -24,6 +43,12 @@ services:
       MYSQL_ROOT_PASSWORD: password
     volumes:
       - db-data:/var/lib/mysql
+    networks:
+      - app-network
 
 volumes:
   db-data:
+
+networks:
+  app-network:
+    driver: bridge
