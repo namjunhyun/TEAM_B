@@ -1,5 +1,9 @@
 package com.example.summary_poc.service;
 
+import com.example.summary_poc.config.ClovaProperties;
+import com.example.summary_poc.config.OpenAiProperties;
+import com.example.summary_poc.dto.OpenAiRequest;
+import com.example.summary_poc.dto.OpenAiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +25,12 @@ import java.util.*;
 public class SummaryService {
 
     private final RestTemplate restTemplate;
+    private final OpenAiProperties openAiProperties; // 둘 다 openai api를 연동기 시키기 위해 주입
+    private final ClovaProperties clovaProperties; // clova-speech
+
+    // opneai api url과 model
+    private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+    private static final String MODEL = "gpt-4o-mini";
 
     public String extractSummary(String text, int topN) {
         String[] sentences = text.split("(?<=[.!?])\\s+");
@@ -51,6 +61,9 @@ public class SummaryService {
     }
 
     public String transcribeWithClova(File file) throws IOException {
+        // 키 가리기 용도
+        String clovaKey = clovaProperties.getKey();
+
         // Clova Speech API 파라미터
         Map<String, Object> params = new LinkedHashMap<>();
         params.put("language", "ko-KR");
@@ -71,7 +84,7 @@ public class SummaryService {
 
         // 헤더 설정 (Content-Type 생략, Spring이 자동으로 multipart 설정)
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-CLOVASPEECH-API-KEY", "c1b443db535f41e184ea5e232bd8a833");
+        headers.set("X-CLOVASPEECH-API-KEY", clovaKey);
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(multipartBody, headers);
 
@@ -90,5 +103,42 @@ public class SummaryService {
         return text != null ? text.toString() : null;
     }
 
+    // 여기부터 openai api를 이용한 요약 기능 함수들
+    // 3줄요약
+    public String summarizeIn3Lines(String originalText) {
+        System.out.println("OPENAI_KEY: " + openAiProperties.getKey()); // 키 점검 차원
+        return callOpenAi("다음 글을 세 줄로 요약해줘:\n\n" + originalText, 0.5);
+    }
 
+    // 핵심 키워드
+    public String extractKeywords(String originalText) {
+        return callOpenAi("다음 글에서 핵심 키워드 5~10개를 추출해서 쉼표로 구분해줘:\n\n" + originalText, 0.3);
+    }
+
+    public String callOpenAi(String prompt, double temperature) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(openAiProperties.getKey());
+
+        OpenAiRequest request = new OpenAiRequest(
+                MODEL,
+                List.of(
+                        new OpenAiRequest.Message("system", "너는 문서 요약 전문가야."),
+                        new OpenAiRequest.Message("user", prompt)
+                ),
+                temperature
+        );
+
+        HttpEntity<OpenAiRequest> entity = new HttpEntity<>(request, headers);
+        ResponseEntity<OpenAiResponse> response = restTemplate.postForEntity(
+                OPENAI_URL, entity, OpenAiResponse.class
+        );
+
+        // 에러 코드 구현
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return response.getBody().getChoices().get(0).getMessage().getContent().trim();
+        } else {
+            throw new RuntimeException("OpenAI API 호출 실패: " + response.getStatusCode());
+        }
+    }
 }

@@ -10,6 +10,7 @@ COPY build.gradle ./
 COPY settings.gradle ./
 
 RUN dos2unix gradlew
+RUN chmod +x gradlew
 
 COPY src src
 

@@ -35,12 +35,18 @@ public class SummaryController {
         String text = summaryService.transcribeWithClova(tempFile);
 
         // 3. 요약
-        String summary = summaryService.extractSummary(text, count);
+        // OpenAi Api 사용후 세가지 방식으로 늘려서 수정
+        String sentenceSummary = summaryService.extractSummary(text, count);
+        String threeLineSummary = summaryService.summarizeIn3Lines(text);
+        String keywords = summaryService.extractKeywords(text);
 
         // 4. 결과 반환
         Map<String, String> result = new HashMap<>();
         result.put("original", text);
-        result.put("summary", summary);
+        result.put("sentenceSummary", sentenceSummary);
+        result.put("threeLineSummary", threeLineSummary);
+        result.put("keywords", keywords);
+
         return ResponseEntity.ok(result);
     }
 }

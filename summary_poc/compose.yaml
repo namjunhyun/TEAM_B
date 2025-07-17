@@ -8,3 +8,5 @@ services:
     container_name: summary_poc
     ports:
       - "8080:8080"
+    env_file:
+      - .env
