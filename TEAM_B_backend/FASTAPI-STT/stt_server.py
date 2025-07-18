@@ -3,6 +3,7 @@ import json
 import tempfile
 import asyncio
 import subprocess
+from http.client import responses
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
@@ -29,11 +30,24 @@ CLOVA_API_KEY = os.getenv("CLOVA_API_KEY")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-//예외처리
+# 예외처리
 if not (CLOVA_STT_URL and CLOVA_API_KEY and openai.api_key):
     raise RuntimeError("환경변수가 설정되어 있지 않습니다.")
 
-//m4a파일 wav로 변환
+# Spring 전송 함수
+def send_to_spring_backend(user_id: int, summary: str):
+    try:
+        spring_url = "http://localhost:8000/api/summary"
+        payload = {
+            "user_id": user_id,
+            "summaryText": summary
+        }
+        responses = requests.post(spring_url, json=payload)
+        responses.raise_for_status()
+    except Exception as e:
+        print(f"Spring 서버 전송 실패: {e}")
+
+# m4a파일 wav로 변환
 def convert_m4a_to_wav(m4a_path: str, wav_path: str):
     try:
         subprocess.run(
@@ -46,7 +60,7 @@ def convert_m4a_to_wav(m4a_path: str, wav_path: str):
         raise RuntimeError(f"ffmpeg 변환 실패: {e.stderr.decode()}")
 
 
-//호출과 기타설정
+# 호출과 기타설정
 async def call_clova_stt(wav_path: str) -> str:
     headers = {
         "Accept": "application/json",
@@ -146,6 +160,9 @@ async def upload_stt_summary(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"OpenAI 요약 실패: {e}")
 
     summaries = dict(zip(prompts.keys(), results))
+
+    # Spring 호출을 위한 함수 넣기
+    send_to_spring_backend(user_id=1, summary=summaries["간단요약"])
 
     return JSONResponse({
         "original_text": full_text,
