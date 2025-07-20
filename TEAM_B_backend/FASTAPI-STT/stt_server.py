@@ -3,8 +3,9 @@ import json
 import tempfile
 import asyncio
 import subprocess
-from http.client import responses
+# from http.client import responses
 
+import requests
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,8 +16,10 @@ import openai
 
 load_dotenv()
 
+#FastAPI 초기화 및 CORS 설정
 app = FastAPI()
 
+# CORS 설정 ( 프론트엔드가 다른 포트에서 요청하더라도 허용하기 위해 )
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,28 +27,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# 환경 변수 설정
+# .env 파일에서 API 키와 CLOVA URL을 불러옴.
 CLOVA_STT_URL = os.getenv("CLOVA_INVOKE_URL")
 CLOVA_API_KEY = os.getenv("CLOVA_API_KEY")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-# 예외처리
-if not (CLOVA_STT_URL and CLOVA_API_KEY and openai.api_key):
-    raise RuntimeError("환경변수가 설정되어 있지 않습니다.")
+# 예외처리(없으면 RuntimeError)
+# if not (CLOVA_STT_URL and CLOVA_API_KEY and openai.api_key):a
+#     raise RuntimeError("환경변수가 설정되어 있지 않습니다.")
 
-# Spring 전송 함수
-def send_to_spring_backend(user_id: int, summary: str):
-    try:
-        spring_url = "http://localhost:8000/api/summary"
-        payload = {
-            "user_id": user_id,
-            "summaryText": summary
-        }
-        responses = requests.post(spring_url, json=payload)
-        responses.raise_for_status()
-    except Exception as e:
-        print(f"Spring 서버 전송 실패: {e}")
+# # Spring 전송 함수 (추후 db 저장에 사용)
+# def send_to_spring_backend(user_id: int, summary: str):
+#     try:
+#         spring_url = "http://localhost:8000/api/summary"
+#         payload = {
+#             "user_id": user_id,
+#             "summaryText": summary
+#         }
+#         responses = requests.post(spring_url, json=payload)
+#         responses.raise_for_status()
+#     except Exception as e:
+#         print(f"Spring 서버 전송 실패: {e}")
 
 # m4a파일 wav로 변환
 def convert_m4a_to_wav(m4a_path: str, wav_path: str):
@@ -105,7 +109,7 @@ async def call_openai_summary(text: str, prompt: str, temperature: float = 0.5) 
         return response.choices[0].message.content.strip()
     return await asyncio.to_thread(sync_call)
 
-@app.post("/upload_stt_summary")
+@app.post("/upload_stt_summary") # api명세서랑 추후에 통일 필요할 수도 있음
 async def upload_stt_summary(file: UploadFile = File(...)):
     suffix = os.path.splitext(file.filename)[1].lower()
 
@@ -161,8 +165,8 @@ async def upload_stt_summary(file: UploadFile = File(...)):
 
     summaries = dict(zip(prompts.keys(), results))
 
-    # Spring 호출을 위한 함수 넣기
-    send_to_spring_backend(user_id=1, summary=summaries["간단요약"])
+    # # Spring 호출을 위한 함수 넣기 (추후 db 저장에 사용)
+    # send_to_spring_backend(user_id=1, summary=summaries["간단요약"])
 
     return JSONResponse({
         "original_text": full_text,

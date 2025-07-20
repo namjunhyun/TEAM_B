@@ -1,14 +1,16 @@
-version: "3.8"
+# version: "3.8"
 
 services:
-  stt-server:  # Flask 서버
+  stt-server:  # FastAPI 서버
     build:
-      context: ./flask-stt
+      context: ./FASTAPI-STT
     container_name: stt-server
     ports:
-      - "5000:5000"
+      - "8081:8081"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - CLOVA_API_KEY=${CLOVA_API_KEY}
+      - CLOVA_INVOKE_URL=${CLOVA_INVOKE_URL}
     volumes:
       - ./uploaded_files:/app/uploaded_files
     networks:
@@ -20,35 +22,36 @@ services:
     container_name: stt-backend
     ports:
       - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://stt-db:3306/sttdb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#    environment: // 다 DB
+#      SPRING_DATASOURCE_URL: jdbc:mysql://stt-db:3306/sttdb
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: password
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     volumes:
       - ./uploads/audio:/app/uploads/audio
     depends_on:
-      - stt-db
+      #- stt-db 이것도 DB
       - stt-server
     networks:
       - app-network
 
-  stt-db:  # MySQL 데이터베이스
-    image: mysql:8.0
-    container_name: stt-db
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: sttdb
-      MYSQL_ROOT_PASSWORD: password
-    volumes:
-      - db-data:/var/lib/mysql
-    networks:
-      - app-network
-
-volumes:
-  db-data:
-
+# 추후 DB 설정 시 해제
+#  stt-db:  # MySQL 데이터베이스
+#    image: mysql:8.0
+#    container_name: stt-db
+#    ports:
+#      - "3306:3306"
+#    environment:
+#      MYSQL_DATABASE: sttdb
+#      MYSQL_ROOT_PASSWORD: password
+#    volumes:
+#      - db-data:/var/lib/mysql
+#    networks:
+#      - app-network
+#
+#volumes:
+#  db-data:
+#
 networks:
   app-network:
     driver: bridge
