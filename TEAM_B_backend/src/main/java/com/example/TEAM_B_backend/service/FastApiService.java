@@ -12,16 +12,13 @@ import org.springframework.web.client.RestTemplate;
 import java.io.File;
 
 @Service
-public class FlaskApiService {
+public class FastApiService {
 
     @Autowired
     private RestTemplate restTemplate;
 
-    public String uploadAudioFileToFlask(File audioFile) {
-        String flaskUrl = "http://stt-server:5000/upload_stt_summary";
-
-
-
+    public String uploadAudioFileToFastApi(File audioFile) {
+        String fastApiUrl = "http://stt-server:8000/upload_stt_summary";
 
         // 멀티파트 폼 데이터 준비
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -33,12 +30,12 @@ public class FlaskApiService {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(flaskUrl, requestEntity, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(fastApiUrl, requestEntity, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
-            return response.getBody();  // Flask가 JSON 문자열로 반환함
+            return response.getBody();  // FastAPI가 JSON 문자열로 반환함
         } else {
-            throw new RuntimeException("Flask API 호출 실패: " + response.getStatusCode());
+            throw new RuntimeException("FastAPI 호출 실패: " + response.getStatusCode());
         }
     }
 }

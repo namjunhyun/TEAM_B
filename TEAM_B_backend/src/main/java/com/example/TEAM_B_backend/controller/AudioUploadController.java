@@ -1,6 +1,7 @@
 package com.example.TEAM_B_backend.controller;
 
 import com.example.TEAM_B_backend.service.AudioStorageService;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,11 @@ public class AudioUploadController {
 
     @Autowired
     private AudioStorageService storageService;
+
+    @PostConstruct
+    public void init() {
+        System.out.println("✅ AudioUploadController 초기화됨");
+    }
 
     @PostMapping("/audio")
     public ResponseEntity<?> uploadAudio(@RequestParam("file") MultipartFile file) {
@@ -45,4 +51,5 @@ public class AudioUploadController {
             return ResponseEntity.internalServerError().body(Map.of("error", "파일 저장 실패"));
         }
     }
+
 }
