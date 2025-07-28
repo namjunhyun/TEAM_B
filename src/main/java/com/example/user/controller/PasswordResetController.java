@@ -4,7 +4,10 @@ import com.example.user.entity.User;
 import com.example.user.repository.UserRepository;
 import com.example.user.service.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +43,9 @@ public class PasswordResetController {
         return ResponseEntity.ok("비밀번호 재설정 메일 발송됨");
     }
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     // 2. 토큰 검증 및 비밀번호 재설정
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> req) {
@@ -51,7 +57,7 @@ public class PasswordResetController {
         if (user.getResetTokenExpiresAt().isBefore(LocalDateTime.now()))
             throw new RuntimeException("토큰 만료됨");
 
-        user.setPassword(newPassword); // (실제로는 BCrypt 암호화 필요)
+        user.setPassword(passwordEncoder.encode(newPassword)); // 암호화 저장
         user.setResetToken(null);
         user.setResetTokenExpiresAt(null);
         userRepository.save(user);
