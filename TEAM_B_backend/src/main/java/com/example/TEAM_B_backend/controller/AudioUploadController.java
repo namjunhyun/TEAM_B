@@ -22,7 +22,11 @@ public class AudioUploadController {
     }
 
     @PostMapping("/audio")
-    public ResponseEntity<?> uploadAudio(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadAudio(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "situation", required = false) String situation,      //선택사항으로 3가지해서 기존 업로드코드를 이용할수있도록 했습니다
+            @RequestParam(value = "audience", required = false) String audience,    /// 한마디로 메인페이지와 코칭페이지 겸용 업로드 api
+            @RequestParam(value = "style", required = false) String style) {
 
         System.out.println("업로드된 파일 Content-Type: " + file.getContentType());
 
