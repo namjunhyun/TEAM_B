@@ -8,5 +8,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY stt_server.py .
+COPY speaking_speed.py .
+COPY pause_analysis.py .
 
 CMD ["uvicorn", "stt_server:app", "--host", "0.0.0.0", "--port", "8000"]

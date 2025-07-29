@@ -1,5 +1,9 @@
         package com.example.TEAM_B_backend.controller;
 
+        import com.example.TEAM_B_backend.dto.PauseRequestDto;
+        import com.example.TEAM_B_backend.dto.SpeedRequestDto;
+        import com.example.TEAM_B_backend.service.FastApiService;
+        import org.apache.coyote.Response;
         import org.springframework.core.io.FileSystemResource;
         import org.springframework.http.HttpEntity;
         import org.springframework.http.HttpHeaders;
@@ -18,6 +22,13 @@
         @RequestMapping("/api/fastapi")
         public class FastApiController {
 
+            private final FastApiService fastApiService;
+
+            public FastApiController(FastApiService fastApiService) {
+                this.fastApiService = fastApiService;
+            }
+
+            // 업로드 컨트롤러
             @PostMapping("/upload")
             public ResponseEntity<?> uploadAndCallFastApi(@RequestParam("file") MultipartFile multipartFile) {
                 if (multipartFile.isEmpty()) {
@@ -53,5 +64,17 @@
                     e.printStackTrace();
                     return ResponseEntity.internalServerError().body("FastAPI 요청 실패: " + e.getMessage());
                 }
+            }
+
+            // 속도 측정 컨트롤러
+            @PostMapping("/analyze-speed")
+            public ResponseEntity<?> analyzeSpeed(@RequestBody SpeedRequestDto dto) {
+                return ResponseEntity.ok(fastApiService.callAnalyzeSpeed(dto));
+            }
+
+            // 공백 측정 컨트롤러
+            @PostMapping("/analyze-pause")
+            public ResponseEntity<?> analyzePause(@RequestBody PauseRequestDto dto) {
+                return ResponseEntity.ok(fastApiService.callAnalyzePause(dto));
             }
         }
