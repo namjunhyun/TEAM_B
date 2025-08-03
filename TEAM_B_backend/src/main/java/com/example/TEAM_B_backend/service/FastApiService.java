@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import com.example.TEAM_B_backend.dto.SpeedRequestDto;
+import com.example.TEAM_B_backend.dto.PauseRequestDto;
+
 
 import java.io.File;
 
@@ -37,5 +40,23 @@ public class FastApiService {
         } else {
             throw new RuntimeException("FastAPI 호출 실패: " + response.getStatusCode());
         }
+    }
+
+    // 속도 측정 서비스
+    public String callAnalyzeSpeed(SpeedRequestDto dto) {
+        String url = "http://stt-server:8000/analyze_speed";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<SpeedRequestDto> request = new HttpEntity<>(dto, headers);
+        return restTemplate.postForObject(url, request, String.class);
+    }
+
+    // 공백 측정 서비스
+    public String callAnalyzePause(PauseRequestDto dto) {
+        String url = "http://stt-server:8000/analyze_pause";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<PauseRequestDto> request = new HttpEntity<>(dto, headers);
+        return restTemplate.postForObject(url, request, String.class);
     }
 }

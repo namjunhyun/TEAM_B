@@ -35,7 +35,7 @@ public class CoachingController {
             multipartFile.transferTo(tempFile);
 
             // FastAPI coaching API 주소
-            String fastApiUrl = "http://stt-server:8000/upload_feedback";
+            String fastApiUrl = "http://stt-server:8000/upload_stt_summary";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
