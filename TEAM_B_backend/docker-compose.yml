@@ -33,16 +33,47 @@ services:
     networks:
       - app-network
 
-  stt-db:  # MySQL 데이터베이스
-    image: mysql:8.0
-    container_name: stt-db
+#  stt-db:  # 이게 기존 stt 전용 MySQL DB로 놔둔건데 아마 삭제하셔야 할거에요.(로그인 데베 쓰시려면) 혹시 몰라서 일단 남겨둡니다.
+#    image: mysql:8.0
+#    container_name: stt-db
+#    ports:
+#      - "3306:3306"
+#    environment:
+#      MYSQL_DATABASE: sttdb
+#      MYSQL_ROOT_PASSWORD: password
+#    volumes:
+#      - db-data:/var/lib/mysql
+#    networks:
+#      - app-network
+
+  # 이게 제가 로그인 구현 때 사용한 로그인 백엔드 서버
+  login-backend:
+    build:
+      context: .
+    container_name: login-backend
     ports:
-      - "3306:3306"
+      - "8080:8080"
     environment:
-      MYSQL_DATABASE: sttdb
+      SPRING_DATASOURCE_URL: jdbc:mysql://login-db:3306/login_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      - login-db
+    networks:
+      - app-network
+
+  # 로그인 전용 MySQL DB
+  login-db:
+    image: mysql:8.0
+    container_name: login-db
+    ports:
+      - "3307:3306" # stt가 3306 사용해서 외부(로컬)만 3307로 바꿈. 근데 이제 stt 3306 안쓰니까 수정해도 괜찮을 것 같습니다.
+    environment:
+      MYSQL_DATABASE: login_db
       MYSQL_ROOT_PASSWORD: password
     volumes:
-      - db-data:/var/lib/mysql
+      - login_db-data:/var/lib/mysql
     networks:
       - app-network
 

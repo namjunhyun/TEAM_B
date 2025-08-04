@@ -1,6 +1,6 @@
-package com.example.TEAM_B_backend.controller;
+package com.example.TEAM_B_backend.core.controller;
 
-import com.example.TEAM_B_backend.service.AudioStorageService;
+import com.example.TEAM_B_backend.core.service.AudioStorageService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

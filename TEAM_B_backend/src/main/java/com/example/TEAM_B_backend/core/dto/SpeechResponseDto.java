@@ -1,4 +1,4 @@
-package com.example.speech.dto;
+package com.example.TEAM_B_backend.core.dto;
 
 import lombok.Getter;
 import lombok.Setter;

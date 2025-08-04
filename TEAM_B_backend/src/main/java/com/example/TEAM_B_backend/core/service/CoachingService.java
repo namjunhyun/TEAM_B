@@ -1,4 +1,4 @@
-package com.example.TEAM_B_backend.service;
+package com.example.TEAM_B_backend.core.service;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;

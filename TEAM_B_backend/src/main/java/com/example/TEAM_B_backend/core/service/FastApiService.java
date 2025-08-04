@@ -1,4 +1,4 @@
-package com.example.TEAM_B_backend.service;
+package com.example.TEAM_B_backend.core.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import com.example.TEAM_B_backend.dto.SpeedRequestDto;
-import com.example.TEAM_B_backend.dto.PauseRequestDto;
+import com.example.TEAM_B_backend.core.dto.SpeedRequestDto;
+import com.example.TEAM_B_backend.core.dto.PauseRequestDto;
 
 
 import java.io.File;
