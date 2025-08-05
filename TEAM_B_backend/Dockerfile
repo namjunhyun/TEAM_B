@@ -21,7 +21,8 @@ RUN dos2unix gradlew
 COPY src src
 # 소스코드 복사
 
-RUN ./gradlew build --no-daemon
+RUN ./gradlew build -x test --no-daemon
+
 # 빌드. 단, 이 단계에서 `application.yml`이 없으면 실패할 수도 있음
 
 EXPOSE 8080

@@ -1,7 +1,7 @@
 package com.example.TEAM_B_backend.user.service;
 
-import com.example.user.dto.SignupRequestDto;
-import com.example.user.entity.User;
+import com.example.TEAM_B_backend.user.dto.SignupRequestDto;
+import com.example.TEAM_B_backend.user.entity.User;
 import com.example.TEAM_B_backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

@@ -1,8 +1,8 @@
 package com.example.TEAM_B_backend.user.controller;
 
-import com.example.user.entity.User;
+import com.example.TEAM_B_backend.user.entity.User;
 import com.example.TEAM_B_backend.user.repository.UserRepository;
-import com.example.user.service.EmailService;
+import com.example.TEAM_B_backend.user.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

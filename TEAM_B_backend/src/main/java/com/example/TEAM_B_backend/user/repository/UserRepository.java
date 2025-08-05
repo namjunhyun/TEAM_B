@@ -1,6 +1,6 @@
 package com.example.TEAM_B_backend.user.repository;
 
-import com.example.user.entity.User;
+import com.example.TEAM_B_backend.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,17 +1,18 @@
 package com.example.TEAM_B_backend.core.controller;
 
+import com.example.TEAM_B_backend.core.dto.TextFileDto;
 import com.example.TEAM_B_backend.core.dto.PauseRequestDto;
 import com.example.TEAM_B_backend.core.dto.SpeedRequestDto;
 import com.example.TEAM_B_backend.core.service.FastApiService;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import com.example.TEAM_B_backend.core.service.TextFileService;
+import com.example.TEAM_B_backend.user.entity.User;
+import com.example.TEAM_B_backend.user.repository.UserRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -22,39 +23,55 @@ import java.io.IOException;
 public class FastApiController {
 
     private final FastApiService fastApiService;
+    private final TextFileService textFileService;
+    private final UserRepository userRepository;
 
-    public FastApiController(FastApiService fastApiService) {
+    public FastApiController(FastApiService fastApiService,
+                             TextFileService textFileService,
+                             UserRepository userRepository) {
         this.fastApiService = fastApiService;
+        this.textFileService = textFileService;
+        this.userRepository = userRepository;
     }
 
     // 업로드 컨트롤러
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadAndCallFastApi(@RequestParam("file") MultipartFile multipartFile) {
+    public ResponseEntity<?> uploadAndCallFastApi(@RequestParam("file") MultipartFile multipartFile,
+                                                  HttpServletRequest request) {
         if (multipartFile.isEmpty()) {
             return ResponseEntity.badRequest().body("파일이 비어 있습니다.");
         }
+
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+
+        Long userId = (Long) session.getAttribute("userId");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         try {
             // MultipartFile을 임시 파일로 저장
             File tempFile = File.createTempFile("upload-", multipartFile.getOriginalFilename());
             multipartFile.transferTo(tempFile);
 
-            // FastAPI API 호출
-            String fastApiUrl = "http://stt-server:8000/upload_stt_summary";
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            // FastAPI API 호출 (DTO로 받기)
+            TextFileDto responseDto = fastApiService.uploadAudioFileToFastApi(tempFile);
 
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", new FileSystemResource(tempFile));
-
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.postForEntity(fastApiUrl, requestEntity,  String.class);
+            // DB에 저장
+            textFileService.saveTextFile(multipartFile.getOriginalFilename(),
+                    responseDto.getTranscript(),
+                    responseDto.getSummary1(),
+                    responseDto.getSummary2(),
+                    responseDto.getSummary3(),
+                    user);
 
             // 임시 파일 삭제
             tempFile.delete();
 
-            return ResponseEntity.ok(response.getBody());
+            // 결과 반환
+            return ResponseEntity.ok(responseDto);
 
         } catch (IOException e) {
             e.printStackTrace();

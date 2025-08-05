@@ -1,9 +1,9 @@
 package com.example.TEAM_B_backend.user.controller;
 
-import com.example.user.dto.LoginRequestDto;
-import com.example.user.dto.SignupRequestDto;
-import com.example.user.entity.User;
-import com.example.user.service.UserService;
+import com.example.TEAM_B_backend.user.dto.LoginRequestDto;
+import com.example.TEAM_B_backend.user.dto.SignupRequestDto;
+import com.example.TEAM_B_backend.user.entity.User;
+import com.example.TEAM_B_backend.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
