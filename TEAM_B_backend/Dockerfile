@@ -15,6 +15,8 @@ COPY build.gradle ./
 # gradle 설정 파일 복사
 COPY settings.gradle ./
 # settings.gradle도 필요
+COPY src/main/resources/keystore.p12 /app/keystore.p12
+# https를 위한 keystore
 RUN dos2unix gradlew
 # 개행문자 수정
 
