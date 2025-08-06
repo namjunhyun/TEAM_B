@@ -23,6 +23,17 @@ load_dotenv()
 
 app = FastAPI()
 
+# 프론트 서버 연동
+origins = ["https://saymary-frontend.vercel.app"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins, # 프론트 주소 허용
+    allow_credentials=True,
+    allow_methods=["*"], # GET, POST 등 허용
+    allow_headers=["*"], # 모든 헤더 허용
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
