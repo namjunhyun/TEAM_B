@@ -47,4 +47,14 @@ public class TextFileService {
                 )
         );
     }
+    public TextFileDto getTextFileByIdAndUserId(Long fileId, Long userId) {
+        TextFile textFile = textFileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다."));
+
+        if (!textFile.getUser().getId().equals(userId)) {
+            throw new RuntimeException("접근 권한이 없습니다.");
+        }
+
+        return new TextFileDto(textFile);
+    }
 }
