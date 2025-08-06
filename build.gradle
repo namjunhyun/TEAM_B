@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot 기본
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'       // 웹 어노테이션 포함
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'   // JPA, Entity 포함
+    implementation 'org.springframework.boot:spring-boot-starter-security'   // BCrypt 등 보안
+    implementation 'org.springframework.boot:spring-boot-starter-mail'  // 비밀번호 재설정 관련 의존성
+
+    // DB
+    runtimeOnly 'com.mysql:mysql-connector-j'                               // MySQL 드라이버
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'                                  // Lombok 컴파일 시 필요
+    annotationProcessor 'org.projectlombok:lombok'                          // Lombok 어노테이션 프로세서
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // 테스트
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

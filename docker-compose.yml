@@ -1,0 +1,75 @@
+version: "3.8"
+
+services:
+  # FastAPI 서버 (구) stt-server
+  fastapi-server:
+    build:
+      context: ./fastapi-server
+    container_name: fastapi-server
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./uploaded_files:/app/uploaded_files
+    networks:
+      - app-network
+
+  # Spring Boot 서버 (구) stt-backend
+  mainspring-server:
+    build:
+      context: .
+    container_name: mainspring-server
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://main-db:3306/main_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    volumes:
+      - ./uploads/audio:/app/uploads/audio
+    depends_on:
+      - fastapi-server
+    networks:
+      - app-network
+
+
+#  # 이게 제가 로그인 구현 때 사용한 로그인 백엔드 서버 (통합 시킴)
+#  login-backend:
+#    build:
+#      context: .
+#    container_name: login-backend
+#    ports:
+#      - "8081:8080"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://login-db:3306/login_db
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: password
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#    depends_on:
+#      - login-db
+#    networks:
+#      - app-network
+
+  # 로그인 전용 MySQL DB -> 이제 이걸로 다 통합.(이름을 login-db -> main-db)로 수정.
+  main-db:
+    image: mysql:8.0
+    container_name: main-db
+    ports:
+      - "3307:3306" # 제가 workbench 로컬에서 사용해서 3307로 쓰겠습니다..
+    environment:
+      MYSQL_DATABASE: main_db
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - main_db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+  main_db-data:
+
+networks:
+  app-network:
+    driver: bridge

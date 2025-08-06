@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+requests
+python-dotenv
+openai
+httpx
+ffmpeg-python  # (ffmpeg 제어용, 선택 사항)
+python-multipart
