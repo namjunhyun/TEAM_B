@@ -41,12 +41,21 @@ if not (CLOVA_STT_URL and CLOVA_API_KEY and openai.api_key):
     raise RuntimeError("환경변수가 설정되어 있지 않습니다.")
 
 # Spring 전송 함수
-def send_to_spring_backend(user_id: int, summary: str):
+def send_to_spring_backend(
+        user_id: int,
+        original_filename: str,
+        transcript: str,
+        summaries: dict
+):
     try:
-        spring_url = "http://stt-backend:8080/api/summary"
+        spring_url = "http://mainspring-server:8080/api/summary"
         payload = {
             "user_id": user_id,
-            "summaryText": summary
+            "originalFilename": original_filename,
+            "transcript": transcript,
+            "summary1": summaries["간단요약"],
+            "summary2": summaries["상세요약"],
+            "summary3": summaries["키워드요약"]
         }
         responses = requests.post(spring_url, json=payload)
         responses.raise_for_status()
@@ -240,7 +249,12 @@ async def upload_stt_summary(file: UploadFile = File(...)):
     pause_feedback = get_pause_feedback(full_text, pause_stats)
 
     # Spring 호출을 위한 함수 넣기
-    send_to_spring_backend(user_id=1, summary=summaries["간단요약"])
+    send_to_spring_backend(
+        user_id=1,
+        original_filename=file.filename,
+        transcript=full_text,
+        summaries=summaries
+    )
 
     return JSONResponse({
         "original_text": full_text,

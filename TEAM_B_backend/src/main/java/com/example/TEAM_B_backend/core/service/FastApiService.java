@@ -1,6 +1,6 @@
 package com.example.TEAM_B_backend.core.service;
 
-import com.example.TEAM_B_backend.core.dto.TextFileDto;
+import com.example.TEAM_B_backend.archive.dto.TextFileDto;
 import com.example.TEAM_B_backend.core.dto.SpeedRequestDto;
 import com.example.TEAM_B_backend.core.dto.PauseRequestDto;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,7 +21,7 @@ public class FastApiService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public TextFileDto uploadAudioFileToFastApi(File audioFile) {
-        String fastApiUrl = "http://stt-server:8000/upload_stt_summary";
+        String fastApiUrl = "http://fastapi-server:8000/upload_stt_summary";
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         Resource fileResource = new FileSystemResource(audioFile);
@@ -69,7 +69,7 @@ public class FastApiService {
 
     // 속도 측정 서비스
     public String callAnalyzeSpeed(SpeedRequestDto dto) {
-        String url = "http://stt-server:8000/analyze_speed";
+        String url = "http://fastapi-server:8000/analyze_speed";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<SpeedRequestDto> request = new HttpEntity<>(dto, headers);
@@ -78,7 +78,7 @@ public class FastApiService {
 
     // 공백 측정 서비스
     public String callAnalyzePause(PauseRequestDto dto) {
-        String url = "http://stt-server:8000/analyze_pause";
+        String url = "http://fastapi-server:8000/analyze_pause";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<PauseRequestDto> request = new HttpEntity<>(dto, headers);

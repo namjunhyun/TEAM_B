@@ -20,7 +20,7 @@ public class CoachingService {
                                                 String audience,
                                                 String style) {
 
-        String fastApiUrl = "http://stt-server:8000/upload_feedback";
+        String fastApiUrl = "http://fastapi-server:8000/upload_feedback";
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         Resource fileResource = new FileSystemResource(audioFile);

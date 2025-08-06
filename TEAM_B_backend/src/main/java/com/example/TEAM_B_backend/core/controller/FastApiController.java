@@ -1,10 +1,10 @@
 package com.example.TEAM_B_backend.core.controller;
 
-import com.example.TEAM_B_backend.core.dto.TextFileDto;
+import com.example.TEAM_B_backend.archive.dto.TextFileDto;
 import com.example.TEAM_B_backend.core.dto.PauseRequestDto;
 import com.example.TEAM_B_backend.core.dto.SpeedRequestDto;
 import com.example.TEAM_B_backend.core.service.FastApiService;
-import com.example.TEAM_B_backend.core.service.TextFileService;
+import com.example.TEAM_B_backend.archive.fileService.TextFileService;
 import com.example.TEAM_B_backend.user.entity.User;
 import com.example.TEAM_B_backend.user.repository.UserRepository;
 

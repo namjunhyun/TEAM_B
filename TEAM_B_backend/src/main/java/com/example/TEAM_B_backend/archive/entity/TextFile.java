@@ -1,4 +1,4 @@
-package com.example.TEAM_B_backend.core.entity;
+package com.example.TEAM_B_backend.archive.entity;
 
 import com.example.TEAM_B_backend.user.entity.User;
 import jakarta.persistence.*;
@@ -23,7 +23,7 @@ public class TextFile {
     private String originalFileName;
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    private String transcriptText;
+    private String transcript; // transcript로 통일
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String summary1;
@@ -41,10 +41,10 @@ public class TextFile {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public TextFile(String originalFileName, String transcriptText,
+    public TextFile(String originalFileName, String transcript,
                       String summary1, String summary2, String summary3, User user) {
         this.originalFileName = originalFileName;
-        this.transcriptText = transcriptText;
+        this.transcript = transcript;
         this.summary1 = summary1;
         this.summary2 = summary2;
         this.summary3 = summary3;

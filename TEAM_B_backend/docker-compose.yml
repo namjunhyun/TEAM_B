@@ -1,10 +1,11 @@
 version: "3.8"
 
 services:
-  stt-server:  # FastAPI 서버
+  # FastAPI 서버 (구) stt-server
+  fastapi-server:
     build:
-      context: ./FASTAPI-STT
-    container_name: stt-server
+      context: ./fastapi-server
+    container_name: fastapi-server
     ports:
       - "8000:8000"
     env_file:
@@ -13,72 +14,61 @@ services:
       - ./uploaded_files:/app/uploaded_files
     networks:
       - app-network
-  stt-db:   # 여기에 stt-backend 전용 MySQL 컨테이너 추가
-    image: mysql:8.0
-    container_name: stt-db
-    ports:
-      - "3306:3306"   # 로컬에서 3306 포트로 접속 가능
-    environment:
-      MYSQL_DATABASE: sttdb
-      MYSQL_ROOT_PASSWORD: password
-    volumes:
-      - db-data:/var/lib/mysql
-    networks:
-      - app-network
 
-  stt-backend:  # Spring Boot 서버
+  # Spring Boot 서버 (구) stt-backend
+  mainspring-server:
     build:
       context: .
-    container_name: stt-backend
+    container_name: mainspring-server
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://stt-db:3306/sttdb
+      SPRING_DATASOURCE_URL: jdbc:mysql://main-db:3306/main_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     volumes:
       - ./uploads/audio:/app/uploads/audio
     depends_on:
-      - stt-server
+      - fastapi-server
     networks:
       - app-network
 
 
-  # 이게 제가 로그인 구현 때 사용한 로그인 백엔드 서버
-  login-backend:
-    build:
-      context: .
-    container_name: login-backend
-    ports:
-      - "8081:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://login-db:3306/login_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    depends_on:
-      - login-db
-    networks:
-      - app-network
+#  # 이게 제가 로그인 구현 때 사용한 로그인 백엔드 서버 (통합 시킴)
+#  login-backend:
+#    build:
+#      context: .
+#    container_name: login-backend
+#    ports:
+#      - "8081:8080"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://login-db:3306/login_db
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: password
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#    depends_on:
+#      - login-db
+#    networks:
+#      - app-network
 
-  # 로그인 전용 MySQL DB
-  login-db:
+  # 로그인 전용 MySQL DB -> 이제 이걸로 다 통합.(이름을 login-db -> main-db)로 수정.
+  main-db:
     image: mysql:8.0
-    container_name: login-db
+    container_name: main-db
     ports:
-      - "3307:3306" # stt가 3306 사용해서 외부(로컬)만 3307로 바꿈. 근데 이제 stt 3306 안쓰니까 수정해도 괜찮을 것 같습니다.
+      - "3307:3306" # 제가 workbench 로컬에서 사용해서 3307로 쓰겠습니다..
     environment:
-      MYSQL_DATABASE: login_db
+      MYSQL_DATABASE: main_db
       MYSQL_ROOT_PASSWORD: password
     volumes:
-      - login_db-data:/var/lib/mysql
+      - main_db-data:/var/lib/mysql
     networks:
       - app-network
 
 volumes:
   db-data:
-  login_db-data:
+  main_db-data:
 
 networks:
   app-network:
