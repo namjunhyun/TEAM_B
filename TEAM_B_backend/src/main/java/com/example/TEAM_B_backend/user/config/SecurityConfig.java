@@ -16,6 +16,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // 버전에 따라 방식 변경
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll() // 모든 요청 허용
+                )
+                .formLogin(form -> form
+                    .loginProcessingUrl("/login") // 로그인 요청을 처리할 URL
+                        .permitAll()
                 );
         return http.build();
     }
