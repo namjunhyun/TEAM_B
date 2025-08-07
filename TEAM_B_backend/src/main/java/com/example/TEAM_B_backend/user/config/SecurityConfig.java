@@ -20,8 +20,8 @@ public class SecurityConfig {
                 .cors().and()
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/signup", "/css/**", "/js/**").permitAll()  // 로그인, 회원가입은 허용
-                        .anyRequest().authenticated()  // 나머지는 인증 필요
+                        .requestMatchers("/api/user/login", "/api/user/signup", "/css/**", "/js/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(Customizer.withDefaults())  // ✅ 세션 기반 로그인 활성화
                 .logout(Customizer.withDefaults());   // 로그아웃 기본 설정
