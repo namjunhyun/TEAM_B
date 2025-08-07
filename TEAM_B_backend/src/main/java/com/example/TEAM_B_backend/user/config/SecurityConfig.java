@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -23,19 +25,24 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/login", "/api/user/signup", "/css/**", "/js/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable())  // 기본 로그인 폼 기능 완전 비활성화
-                .logout(Customizer.withDefaults());   // 로그아웃 기본 설정
+                .formLogin(form -> form.disable())
+                .logout(Customizer.withDefaults());
 
         return http.build();
     }
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("https://saymary.site" , "http://localhost:3000"));  // 프론트 주소
+        config.setAllowedOriginPatterns(List.of("https://saymary.site", "http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);  // ✅ 쿠키 포함 허용
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

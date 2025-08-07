@@ -4,9 +4,7 @@ import com.example.TEAM_B_backend.user.entity.User;
 import com.example.TEAM_B_backend.user.repository.UserRepository;
 import com.example.TEAM_B_backend.user.service.EmailService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +22,7 @@ public class PasswordResetController {
 
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     // 1. 비밀번호 재설정 요청
     @PostMapping("/request-reset")
@@ -34,7 +33,7 @@ public class PasswordResetController {
 
         String token = UUID.randomUUID().toString();
         user.setResetToken(token);
-        user.setResetTokenExpiresAt(LocalDateTime.now().plusMinutes(10)); // 10분만 토큰 유효 -> 10분안에 인증받고 변경해야함
+        user.setResetTokenExpiresAt(LocalDateTime.now().plusMinutes(10)); // 10분간 토큰 유효
         userRepository.save(user);
 
         String resetUrl = "http://localhost:8080/reset-password?token=" + token;
@@ -42,9 +41,6 @@ public class PasswordResetController {
 
         return ResponseEntity.ok("비밀번호 재설정 메일 발송됨");
     }
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     // 2. 토큰 검증 및 비밀번호 재설정
     @PostMapping("/reset-password")
@@ -54,10 +50,12 @@ public class PasswordResetController {
 
         User user = userRepository.findByResetToken(token)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 토큰"));
-        if (user.getResetTokenExpiresAt().isBefore(LocalDateTime.now()))
-            throw new RuntimeException("토큰 만료됨");
 
-        user.setPassword(passwordEncoder.encode(newPassword)); // 암호화 저장
+        if (user.getResetTokenExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("토큰 만료됨");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword)); // 암호화된 비밀번호 저장
         user.setResetToken(null);
         user.setResetTokenExpiresAt(null);
         userRepository.save(user);
