@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 엔드포인트에 대해
-                .allowedOriginPatterns("https://*.vercel.app") // Vercel 우리 프론트 주소에서 *로 수정
+                .allowedOriginPatterns("https://*.vercel.app", "https://saymary.site") // Vercel 우리 프론트 주소에서 *로 수정, 도메인 추가
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true); // 필요한 경우 인증정보 허용
