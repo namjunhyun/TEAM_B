@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
+    public void addCorsMappings(CorsRegistry registry) {// userconfig랑 겹치면 안된다고해서 일단 주석처리했습니다.
         /*registry.addMapping("/**") // 모든 엔드포인트에 대해
                 .allowedOriginPatterns("https://*.vercel.app") // Vercel 우리 프론트 주소에서 *로 수정
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
