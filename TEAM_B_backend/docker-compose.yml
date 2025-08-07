@@ -28,6 +28,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     volumes:
+      - ./build/libs:/app/build/libs
       - ./uploads/audio:/app/uploads/audio
     depends_on:
       - fastapi-server
