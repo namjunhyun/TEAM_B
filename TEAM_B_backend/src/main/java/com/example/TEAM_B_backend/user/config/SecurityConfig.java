@@ -1,13 +1,15 @@
-package com.example.TEAM_B_backend.user.config;
+package com.example.TEAM_B_backend.core.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import java.util.List;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -15,39 +17,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors()  // cors추가
-                .and()
-                .csrf(csrf -> csrf.disable()) // 버전에 따라 방식 변경
+                .cors().and()
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // 모든 요청 허용
+                        .requestMatchers("/login", "/signup", "/css/**", "/js/**").permitAll()  // 로그인, 회원가입은 허용
+                        .anyRequest().authenticated()  // 나머지는 인증 필요
                 )
-                .formLogin(form -> form
-                    .loginProcessingUrl("/login") // 로그인 요청을 처리할 URL
-                        .permitAll()
-                );
-        return http.build();
-    }
+                .formLogin(Customizer.withDefaults())  // ✅ 세션 기반 로그인 활성화
+                .logout(Customizer.withDefaults());   // 로그아웃 기본 설정
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("https://*.vercel.app"));  // Vercel 도메인 패턴 허용
+        config.setAllowedOriginPatterns(List.of("https://*.vercel.app", "http://localhost:3000"));  // 프론트 주소
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(true);  // ✅ 쿠키 포함 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
-
 }
-
-
-
