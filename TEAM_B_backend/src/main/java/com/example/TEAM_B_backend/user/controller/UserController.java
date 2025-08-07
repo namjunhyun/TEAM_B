@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -36,7 +38,6 @@ public class UserController {
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequestDto dto, HttpServletRequest request) {
-        // ✅ 디버깅용 로그 출력
         System.out.println("💬 로그인 요청됨");
         System.out.println("💬 이메일: " + dto.getEmail());
         System.out.println("💬 비밀번호: " + dto.getPassword());
@@ -72,18 +73,23 @@ public class UserController {
         return ResponseEntity.ok("로그아웃 완료");
     }
 
-    // 로그인 상태 확인
+    // 로그인 상태 확인 (JSON 반환)
     @GetMapping("/me")
-    public ResponseEntity<String> getLoginUser(HttpServletRequest request) {
-        try {
-            HttpSession session = request.getSession(false);
-            if (session == null || session.getAttribute("userId") == null) {
-                return ResponseEntity.status(401).body("로그인되지 않음");
-            }
-            String nickname = (String) session.getAttribute("nickname");
-            return ResponseEntity.ok("로그인 중: nickname=" + nickname);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("서버 오류가 발생했습니다.");
+    public ResponseEntity<?> getLoginUser(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "로그인되지 않음"));
         }
+        Long userId = (Long) session.getAttribute("userId");
+        String email = (String) session.getAttribute("email");
+        String nickname = (String) session.getAttribute("nickname");
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "userId", userId,
+                        "email", email,
+                        "nickname", nickname
+                )
+        );
     }
 }
