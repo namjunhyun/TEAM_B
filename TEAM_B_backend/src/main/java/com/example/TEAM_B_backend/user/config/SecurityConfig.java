@@ -23,7 +23,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/login", "/api/user/signup", "/css/**", "/js/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(Customizer.withDefaults())  // ✅ 세션 기반 로그인 활성화
+                .formLogin(form -> form.disable())  // 기본 로그인 폼 기능 완전 비활성화
                 .logout(Customizer.withDefaults());   // 로그아웃 기본 설정
 
         return http.build();
