@@ -4,6 +4,8 @@ import tempfile
 import asyncio
 import subprocess
 from http.client import responses
+from idlelib.search import find_again
+from tkinter.tix import Form
 
 import requests
 
@@ -37,14 +39,6 @@ app.add_middleware(
     allow_methods=["*"], # GET, POST 등 허용
     allow_headers=["*"], # 모든 헤더 허용
 )
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 
 CLOVA_STT_URL = os.getenv("CLOVA_INVOKE_URL")
 CLOVA_API_KEY = os.getenv("CLOVA_API_KEY")
@@ -194,6 +188,81 @@ async def call_openai_summary(text: str, prompt: str, temperature: float = 0.5) 
         )
         return response.choices[0].message.content.strip()
     return await asyncio.to_thread(sync_call)
+
+async def call_openai_feedback(text: str, prompt: str, temperature: float = 0.7) -> str:
+    def sync_call():
+        response = openai.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "당신은 코칭 전문가입니다."},
+                {"role": "user", "content": f"{prompt}\n\n{text}"},
+            ],
+            temperature=temperature,
+            max_tokens=300,
+        )
+        return response.choices[0].message.content.strip()
+    return await asyncio.to_thread(sync_call)
+
+@app.post("/upload_feedback")
+async def upload_feedback(
+        file: UploadFile = File(...),
+        situation: str = Form(...),
+        audience: str = Form(...),
+        style: str = Form(...),
+):
+    suffix = os.path.splitext(file.filename)[1].lower()
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            contents = await file.read()
+            tmp.write(contents)
+            tmp_path = tmp.name
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"파일 저장 실패: {e}")
+
+    wav_path = tmp_path
+    if suffix == ".m4a":
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as wav_tmp:
+                wav_path = wav_tmp.name
+            convert_m4a_to_wav(tmp_path, wav_path)
+        except Exception as e:
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+            try:
+                os.remove(wav_path)
+            except Exception:
+                pass
+            raise HTTPException(status_code=500, detail=f"m4a -> wav 변환 실패: {e}")
+        finally:
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+
+    try:
+        full_text = await call_clova_stt(wav_path)
+    finally:
+        try:
+            os.remove(wav_path)
+        except Exception:
+            pass
+
+    feedback_prompt = (
+        f"상황: {situation}, 청중: {audience}, 스타일: {style}에 맞춰 다음 발화에 대한 피드백을 주세요. "
+        "한줄평, 개선점 분석해 주세요. 그리고 gpt인걸 티안나게 이모티콘사용은 자제해주세요. 깔끔하게 부탁해요\n\n"
+        + full_text
+    )
+    try:
+        feedback = await call_openai_feedback(full_text, feedback_prompt, temperature=0.7)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"OpenAI 피드백 실패: {e}")
+
+    return JSONResponse({
+        "original_text": full_text,
+        "feedback": feedback
+    })
 
 @app.post("/upload_stt_summary")
 async def upload_stt_summary(file: UploadFile = File(...)):
