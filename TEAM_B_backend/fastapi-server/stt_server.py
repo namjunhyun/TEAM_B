@@ -24,7 +24,11 @@ load_dotenv()
 app = FastAPI()
 
 # 프론트 서버 연동
-origins = ["https://saymary-frontend.vercel.app"]
+origins = ["https://*.vercel.app",
+           "https://saymary.site",
+           "http://localhost:3000",
+           "http://loalhost:5173"
+           ]
 
 app.add_middleware(
     CORSMiddleware,
