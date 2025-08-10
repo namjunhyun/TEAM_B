@@ -26,12 +26,12 @@ app = FastAPI()
 origins = ["https://.*\.vercel\.app",
            "https://saymary.site",
            "http://localhost:3000",
-           "http://loalhost:5173"
+           "http://localhost:5173"
            ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex="https://.*\.vercel.\.app", # 프론트 주소 허용
+    allow_origin_regex=r"^https://.*\.vercel\.app$", # 프론트 주소 허용
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"], # GET, POST 등 허용
@@ -247,7 +247,7 @@ async def upload_feedback(
                 pass
 
     try:
-        full_text = await call_clova_stt(wav_path)
+        full_text, segments = await call_clova_stt(wav_path)
     finally:
         try:
             os.remove(wav_path)
@@ -257,7 +257,7 @@ async def upload_feedback(
     feedback_prompt = (
         f"상황: {situation}, 청중: {audience}, 스타일: {style}에 맞춰 다음 발화에 대한 피드백을 주세요. "
         "한줄평, 개선점 분석해 주세요. 그리고 gpt인걸 티안나게 이모티콘사용은 자제해주세요. 깔끔하게 부탁해요\n\n"
-        + full_text
+        f"{full_text}" # 문자열만 붙이기
     )
     try:
         feedback = await call_openai_feedback(full_text, feedback_prompt, temperature=0.7)
