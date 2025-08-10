@@ -3,9 +3,7 @@ import json
 import tempfile
 import asyncio
 import subprocess
-from http.client import responses
-from idlelib.search import find_again
-from tkinter.tix import Form
+from fastapi import Form
 
 import requests
 
@@ -26,15 +24,15 @@ load_dotenv()
 app = FastAPI()
 
 # 프론트 서버 연동
-origins = ["https://*.vercel.app",
-           "https://saymary.site",
-           "http://localhost:3000",
-           "http://loalhost:5173"
-           ]
+# origins = ["https://.*\.vercel\.app",
+#            "https://saymary.site",
+#            "http://localhost:3000",
+#            "http://loalhost:5173"
+#            ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins, # 프론트 주소 허용
+    allow_origins_regax="https://.*\.vercel.\.app", # 프론트 주소 허용
     allow_credentials=True,
     allow_methods=["*"], # GET, POST 등 허용
     allow_headers=["*"], # 모든 헤더 허용
@@ -43,6 +41,13 @@ app.add_middleware(
 CLOVA_STT_URL = os.getenv("CLOVA_INVOKE_URL")
 CLOVA_API_KEY = os.getenv("CLOVA_API_KEY")
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# 키 오류시 친절한 예외 처리
+# MISSING_ENVS = [k for k, v in {
+#     "CLOVA_INVOKE_URL": 클로바 주소,
+#     "CLOVA_API_KEY": CLOVA_API_KEY,
+#     "OPENAI_API_KEY": OPENAI_API_KEY,
+# }.items() if not v]
 
 
 # 예외처리
