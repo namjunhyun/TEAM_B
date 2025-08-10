@@ -31,7 +31,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins_regax="https://.*\.vercel.\.app", # 프론트 주소 허용
+    allow_origins_regex="https://.*\.vercel.\.app", # 프론트 주소 허용
     allow_credentials=True,
     allow_methods=["*"], # GET, POST 등 허용
     allow_headers=["*"], # 모든 헤더 허용
