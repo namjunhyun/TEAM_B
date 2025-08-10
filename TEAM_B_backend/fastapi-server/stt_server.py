@@ -31,7 +31,7 @@ origins = ["https://.*\.vercel\.app",
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins_regex="https://.*\.vercel.\.app", # 프론트 주소 허용
+    allow_origin_regex="https://.*\.vercel.\.app", # 프론트 주소 허용
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"], # GET, POST 등 허용
