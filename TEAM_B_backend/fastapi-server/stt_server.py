@@ -26,12 +26,12 @@ app = FastAPI()
 origins = ["https://.*\.vercel\.app",
            "https://saymary.site",
            "http://localhost:3000",
-           "http://localhost:5173"
+           "http://loalhost:5173"
            ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"^https://.*\.vercel\.app$", # 프론트 주소 허용
+    allow_origin_regex="https://.*\.vercel.\.app", # 프론트 주소 허용
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"], # GET, POST 등 허용
@@ -247,9 +247,7 @@ async def upload_feedback(
                 pass
 
     try:
-        # STT
         full_text, segments = await call_clova_stt(wav_path)
-
     finally:
         try:
             os.remove(wav_path)
