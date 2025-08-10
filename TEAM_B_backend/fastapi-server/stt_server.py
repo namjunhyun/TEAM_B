@@ -26,12 +26,12 @@ app = FastAPI()
 origins = ["https://.*\.vercel\.app",
            "https://saymary.site",
            "http://localhost:3000",
-           "http://loalhost:5173"
+           "http://localhost:5173"
            ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex="https://.*\.vercel.\.app", # 프론트 주소 허용
+    allow_origin_regex=r"^https://.*\.vercel\.app$", # 프론트 주소 허용
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"], # GET, POST 등 허용
@@ -264,9 +264,29 @@ async def upload_feedback(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OpenAI 피드백 실패: {e}")
 
+    # 정확한 전체 오디오 길이 계산
+    duration_seconds = get_audio_duration(wav_path)
+
+    # 속도, 공백 측정을 위한 선언
+    wpm, word_count = calculate_wpm(full_text, duration_seconds)
+    speed_feedback = get_speaking_speed_feedback(full_text, wpm)
+
+    pause_stats = analyze_pauses(segments)
+    pause_feedback = get_pause_feedback(full_text, pause_stats)
+
     return JSONResponse({
         "original_text": full_text,
-        "feedback": feedback
+        "feedback": feedback,
+        "speed_analysis": {
+            "word_count": word_count,
+            "duration_seconds": duration_seconds,
+            "wpm": wpm,
+            "feedback": speed_feedback
+        },
+        "pause_analysis": {
+            "pause_stats": pause_stats,
+            "feedback": pause_feedback
+        }
     })
 
 @app.post("/upload_stt_summary")
@@ -308,9 +328,6 @@ async def upload_stt_summary(file: UploadFile = File(...)):
     try:
         full_text, segments = await call_clova_stt(wav_path)
 
-        # 정확한 전체 오디오 길이 계산
-        duration_seconds = get_audio_duration(wav_path)
-
     finally:
         try:
             os.remove(wav_path)
@@ -330,13 +347,6 @@ async def upload_stt_summary(file: UploadFile = File(...)):
 
     summaries = dict(zip(prompts.keys(), results))
 
-    # 속도, 공백 측정을 위한 선언
-    wpm, word_count = calculate_wpm(full_text, duration_seconds)
-    speed_feedback = get_speaking_speed_feedback(full_text, wpm)
-
-    pause_stats = analyze_pauses(segments)
-    pause_feedback = get_pause_feedback(full_text, pause_stats)
-
     # Spring 호출을 위한 함수 넣기
     send_to_spring_backend(
         user_id=1,
@@ -347,15 +357,5 @@ async def upload_stt_summary(file: UploadFile = File(...)):
 
     return JSONResponse({
         "original_text": full_text,
-        "summaries": summaries,
-        "speed_analysis": {
-            "word_count": word_count,
-            "duration_seconds": duration_seconds,
-            "wpm": wpm,
-            "feedback": speed_feedback
-        },
-        "pause_analysis": {
-            "pause_stats": pause_stats,
-            "feedback": pause_feedback
-        }
+        "summaries": summaries
     })
