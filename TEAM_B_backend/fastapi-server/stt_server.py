@@ -247,7 +247,9 @@ async def upload_feedback(
                 pass
 
     try:
+        # STT
         full_text, segments = await call_clova_stt(wav_path)
+
     finally:
         try:
             os.remove(wav_path)
