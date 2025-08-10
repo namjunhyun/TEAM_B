@@ -12,6 +12,22 @@ services:
       - .env
     volumes:
       - ./uploaded_files:/app/uploaded_files
+      # 대용량 업로드 안정성: /tmp를 호스트 디스크로 마운트
+      - ./uploads/tmp:/tmp
+    # uvicorn 실행 옵션을 명시해서 keep-alive/타임아웃 강화
+    command: >
+      uvicorn stt_server:app
+      --host 0.0.0.0 --port 8000
+      --proxy-headers
+      --forwarded-allow-ips="*"
+      --timeout-keep-alive 120
+      --workers 1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
 
