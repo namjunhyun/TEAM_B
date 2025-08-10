@@ -247,7 +247,10 @@ async def upload_feedback(
                 pass
 
     try:
+        # STT
         full_text, segments = await call_clova_stt(wav_path)
+        # 정확한 전체 오디오 길이 계산
+        duration_seconds = get_audio_duration(wav_path)
     finally:
         try:
             os.remove(wav_path)
@@ -263,9 +266,6 @@ async def upload_feedback(
         feedback = await call_openai_feedback(full_text, feedback_prompt, temperature=0.7)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OpenAI 피드백 실패: {e}")
-
-    # 정확한 전체 오디오 길이 계산
-    duration_seconds = get_audio_duration(wav_path)
 
     # 속도, 공백 측정을 위한 선언
     wpm, word_count = calculate_wpm(full_text, duration_seconds)
