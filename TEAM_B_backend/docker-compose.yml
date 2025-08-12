@@ -43,6 +43,8 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CORS: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: DEBUG
     volumes:
       - ./build/libs:/app/build/libs
       - ./uploads/audio:/app/uploads/audio
