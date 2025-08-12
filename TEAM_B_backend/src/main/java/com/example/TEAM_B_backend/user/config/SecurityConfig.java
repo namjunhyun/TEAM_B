@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // 버전에 따라 방식 변경
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 전부 허용
-                        .requestMatchers("/api/user/login","api/user/signup").permitAll() // 로그인/인증 공개
+                        .requestMatchers("/api/user/login","/api/user/signup").permitAll() // 로그인/인증 공개
                         .anyRequest().authenticated() // 모든 요청 허용 -> authenticated() 인증필요
                 );
 //                .formLogin(form -> form
