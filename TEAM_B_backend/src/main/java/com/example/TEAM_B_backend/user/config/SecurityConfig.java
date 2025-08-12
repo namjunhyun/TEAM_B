@@ -37,24 +37,24 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration cfg = new CorsConfiguration();
-        cfg.setAllowCredentials(true); //쿠키/자격증명 포함 허용
-        cfg.setAllowedOrigins(List.of("https://saymary.site"));
-        // 혼선 방지로 주석 처리
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration cfg = new CorsConfiguration();
+//        cfg.setAllowCredentials(true); //쿠키/자격증명 포함 허용
+//        cfg.setAllowedOrigins(List.of("https://saymary.site"));
+//        // 혼선 방지로 주석 처리
 //        cfg.setAllowedOriginPatterns(List.of(
 //                "https://*.vercel.app"
 //        ));
-        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        cfg.setAllowedHeaders(List.of("*"));
-        //프론트에서 읽어야 하는 헤더가 있으면 노출
-        cfg.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", cfg);
-        return source;
-    }
+//        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//        cfg.setAllowedHeaders(List.of("*"));
+//        //프론트에서 읽어야 하는 헤더가 있으면 노출
+//        cfg.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", cfg);
+//        return source;
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
