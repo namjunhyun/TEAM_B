@@ -2,6 +2,7 @@ package com.example.TEAM_B_backend.user.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,7 +23,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults()) // Security 레벨에서 CORS 활성화
                 .csrf(csrf -> csrf.disable()) // 버전에 따라 방식 변경
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // 모든 요청 허용
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 전부 허용
+                        .requestMatchers("/api/user/login", "/api/auth/**").permitAll() // 로그인/인증 공개
+                        .anyRequest().authenticated() // 모든 요청 허용 -> authenticated()
                 )
                 .formLogin(form -> form
                     .loginProcessingUrl("/login") // 로그인 요청을 처리할 URL
