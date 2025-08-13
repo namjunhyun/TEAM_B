@@ -40,13 +40,13 @@ public class SecurityConfig {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowCredentials(true); //쿠키/자격증명 포함 허용
 
-//        cfg.setAllowedOrigins(List.of("https://saymary.site"));
-        cfg.setAllowedOriginPatterns(List.of(
-                "https://*.vercel.app",
-                "https://saymary.site",
-                "http://localhost:*",
-                "https://localhost:*"
-        ));
+        cfg.setAllowedOrigins(List.of("https://saymary.site"));
+//        cfg.setAllowedOriginPatterns(List.of(
+//                "https://*.vercel.app",
+//                "https://saymary.site",
+//                "http://localhost:*",
+//                "https://localhost:*"
+//        ));
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         cfg.setAllowedHeaders(List.of("*"));
         //프론트에서 읽어야 하는 헤더가 있으면 노출
