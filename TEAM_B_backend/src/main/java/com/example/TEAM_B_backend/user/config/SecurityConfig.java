@@ -28,9 +28,9 @@ public class SecurityConfig {
                 .cors(c -> c.configurationSource((corsConfigurationSource()))) // Security 레벨에서 CORS 활성화
                 .csrf(cs -> cs.disable()) // 버전에 따라 방식 변경
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 전부 허용
-                        .requestMatchers(HttpMethod.POST,"/api/user/login","/api/user/signup").permitAll() // 로그인/인증 공개
-                        .anyRequest().authenticated() // 모든 요청 허용 -> authenticated() 인증필요
+//                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 전부 허용
+//                        .requestMatchers(HttpMethod.POST,"/api/user/login","/api/user/signup").permitAll() // 로그인/인증 공개
+                        .anyRequest().permitAll() // 모든 요청 허용 -> authenticated() 인증필요
                 );
 //                .formLogin(form -> form
 //                    .loginProcessingUrl("/login") // 로그인 요청을 처리할 URL
