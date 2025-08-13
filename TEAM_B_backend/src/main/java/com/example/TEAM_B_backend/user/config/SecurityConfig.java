@@ -26,7 +26,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-//                .cors(Customizer.withDefaults()) // Security 레벨에서 CORS 활성화
+                .cors(Customizer.withDefaults()) // Security 레벨에서 CORS 활성화
                 .csrf(cs -> cs.disable()) // 버전에 따라 방식 변경
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 전부 허용
@@ -40,14 +40,14 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
-        FilterRegistrationBean<CorsFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new CorsFilter(corsConfigurationSource()));
-        registration.addUrlPatterns("/*"); // 모든 URL 패턴에 적용
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE); // 가장 높은 우선순위
-        return registration;
-    }
+//    @Bean
+//    public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
+//        FilterRegistrationBean<CorsFilter> registration = new FilterRegistrationBean<>();
+//        registration.setFilter(new CorsFilter(corsConfigurationSource()));
+//        registration.addUrlPatterns("/*"); // 모든 URL 패턴에 적용
+//        registration.setOrder(Ordered.HIGHEST_PRECEDENCE); // 가장 높은 우선순위
+//        return registration;
+//    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
