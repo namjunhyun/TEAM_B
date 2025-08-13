@@ -55,7 +55,7 @@ public class SecurityConfig {
         //프론트에서 읽어야 하는 헤더가 있으면 노출
         cfg.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(new org.springframework.web.util.pattern.PathPatternParser());
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
         return source;
     }

@@ -21,6 +21,10 @@ public class UserController {
     private final UserService userService;
 
     // 회원가입
+    @CrossOrigin(
+            origins = "https://saymary.site",
+            allowCredentials = "true"
+    )
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignupRequestDto dto) {
         try {
