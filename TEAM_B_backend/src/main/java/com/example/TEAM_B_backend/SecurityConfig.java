@@ -2,6 +2,7 @@ package com.example.TEAM_B_backend;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@Order(1)
 public class SecurityConfig {
 
     @Bean
@@ -40,13 +42,14 @@ public class SecurityConfig {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowCredentials(true); //쿠키/자격증명 포함 허용
 
-        cfg.setAllowedOrigins(List.of("https://saymary.site"));
-//        cfg.setAllowedOriginPatterns(List.of(
-//                "https://*.vercel.app",
-//                "https://saymary.site",
-//                "http://localhost:*",
-//                "https://localhost:*"
-//        ));
+//        cfg.setAllowedOrigins(List.of("https://saymary.site"));
+        cfg.setAllowedOriginPatterns(List.of(
+                "https://*.vercel.app",
+                "https://saymary.site",
+                "https://*.saymary.site",
+                "http://localhost:*",
+                "https://localhost:*"
+        ));
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         cfg.setAllowedHeaders(List.of("*"));
         //프론트에서 읽어야 하는 헤더가 있으면 노출
