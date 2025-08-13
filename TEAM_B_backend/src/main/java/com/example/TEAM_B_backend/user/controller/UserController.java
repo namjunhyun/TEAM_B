@@ -21,10 +21,6 @@ public class UserController {
     private final UserService userService;
 
     // 회원가입
-    @CrossOrigin(
-            origins = "https://saymary.site",
-            allowCredentials = "true"
-    )
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignupRequestDto dto) {
         try {
@@ -38,10 +34,6 @@ public class UserController {
     }
 
     // 로그인
-    @CrossOrigin(
-            origins = "https://saymary.site",
-            allowCredentials = "true"
-    )
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequestDto dto, HttpServletRequest request) {
         // ✅ 디버깅용 로그 출력
@@ -71,10 +63,6 @@ public class UserController {
     }
 
     // 로그아웃
-    @CrossOrigin(
-            origins = "https://saymary.site",
-            allowCredentials = "true"
-    )
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -85,10 +73,6 @@ public class UserController {
     }
 
     // 로그인 상태 확인
-    @CrossOrigin(
-            origins = "https://saymary.site",
-            allowCredentials = "true"
-    )
     @GetMapping("/me")
     public ResponseEntity<String> getLoginUser(HttpServletRequest request) {
         try {

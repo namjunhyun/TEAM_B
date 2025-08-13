@@ -23,10 +23,6 @@ public class PasswordResetController {
     private final EmailService emailService;
 
     // 1. 비밀번호 재설정 요청
-    @CrossOrigin(
-            origins = "https://saymary.site",
-            allowCredentials = "true"
-    )
     @PostMapping("/request-reset")
     public ResponseEntity<?> requestReset(@RequestBody Map<String, String> req) {
         String email = req.get("email");
@@ -48,10 +44,6 @@ public class PasswordResetController {
     private PasswordEncoder passwordEncoder;
 
     // 2. 토큰 검증 및 비밀번호 재설정
-    @CrossOrigin(
-            origins = "https://saymary.site",
-            allowCredentials = "true"
-    )
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> req) {
         String token = req.get("token");
