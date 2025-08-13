@@ -1,5 +1,6 @@
 package com.example.TEAM_B_backend;
 
+import com.example.TEAM_B_backend.user.config.SecurityConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;

@@ -1,4 +1,4 @@
-package com.example.TEAM_B_backend;
+package com.example.TEAM_B_backend.user.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
