@@ -21,7 +21,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(c -> c.configurationSource(corsConfigurationSource())) // Security 레벨에서 CORS 활성화
+                .cors(cors -> cors.configurationSource((corsConfigurationSource()))) // Security 레벨에서 CORS 활성화
                 .csrf(csrf -> csrf.disable()) // 버전에 따라 방식 변경
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 전부 허용
@@ -52,7 +52,7 @@ public class SecurityConfig {
         //프론트에서 읽어야 하는 헤더가 있으면 노출
         cfg.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(new org.springframework.web.util.pattern.PathPatternParser());
         source.registerCorsConfiguration("/**", cfg);
         return source;
     }
