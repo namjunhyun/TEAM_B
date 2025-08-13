@@ -23,7 +23,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // Security 레벨에서 CORS 활성화
+                .cors(c -> c.configurationSource(corsConfigurationSource())) // Security 레벨에서 CORS 활성화
                 .csrf(csrf -> csrf.disable()) // 버전에 따라 방식 변경
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 전부 허용
@@ -41,11 +41,13 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowCredentials(true); //쿠키/자격증명 포함 허용
-        cfg.setAllowedOrigins(List.of("https://saymary.site"));
-//        // 혼선 방지로 주석 처리
-//        cfg.setAllowedOriginPatterns(List.of(
-//                "https://*.vercel.app"
-//        ));
+//        cfg.setAllowedOrigins(List.of("https://saymary.site"));
+        cfg.setAllowedOriginPatterns(List.of(
+                "https://*.vercel.app",
+                "https://saymary.site",
+                "http://localhost:*",
+                "https://localhost:*"
+        ));
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         cfg.setAllowedHeaders(List.of("*"));
         //프론트에서 읽어야 하는 헤더가 있으면 노출
