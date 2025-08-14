@@ -34,7 +34,7 @@ public class PasswordResetController {
         user.setResetTokenExpiresAt(LocalDateTime.now().plusMinutes(10)); // 10분만 토큰 유효 -> 10분안에 인증받고 변경해야함
         userRepository.save(user);
 
-        String resetUrl = "http://localhost:8080/reset-password?token=" + token;
+        String resetUrl = "https://saymary.site/reset-password?token=" + token;
         emailService.sendResetEmail(email, resetUrl);
 
         return ResponseEntity.ok("비밀번호 재설정 메일 발송됨");
