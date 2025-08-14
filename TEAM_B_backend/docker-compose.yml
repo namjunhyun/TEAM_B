@@ -38,8 +38,6 @@ services:
     container_name: mainspring-server
     ports:
       - "8080:8080"
-    env_file:
-      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://main-db:3306/main_db
       SPRING_DATASOURCE_USERNAME: root
@@ -52,6 +50,8 @@ services:
       - ./uploads/audio:/app/uploads/audio
     depends_on:
       - fastapi-server
+    env_file:
+      - .env
     networks:
       - app-network
 
