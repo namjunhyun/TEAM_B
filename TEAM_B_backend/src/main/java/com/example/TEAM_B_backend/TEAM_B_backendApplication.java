@@ -3,9 +3,10 @@ package com.example.TEAM_B_backend;
 import com.example.TEAM_B_backend.user.config.SecurityConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
-@SpringBootApplication(scanBasePackages = "com.example.TEAM_B_backend")
+@SpringBootApplication(scanBasePackages = "com.example.TEAM_B_backend", exclude = {WebMvcAutoConfiguration.class})
 @Import(SecurityConfig.class)
 public class TEAM_B_backendApplication {
 
