@@ -20,13 +20,13 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.List;
 
 @Configuration
-@EnableWebSecurity
+//@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // Security 레벨에서 CORS 활성화
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Security 레벨에서 CORS 활성화
                 .csrf(cs -> cs.disable()) // 버전에 따라 방식 변경
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 전부 허용

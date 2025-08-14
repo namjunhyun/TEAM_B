@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
-@SpringBootApplication(scanBasePackages = "com.example.TEAM_B_backend", exclude = {WebMvcAutoConfiguration.class})
+@SpringBootApplication(scanBasePackages = "com.example.TEAM_B_backend")
 @Import(SecurityConfig.class)
 public class TEAM_B_backendApplication {
 
