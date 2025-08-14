@@ -1,12 +1,8 @@
 package com.example.TEAM_B_backend.user.config;
 
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,46 +11,36 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity // Spring Security를 활성화하는 어노테이션
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                // 1. CORS 설정 : CorsConfigurationSource 빈을 사용하여 CORS 정책을 적용
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Security 레벨에서 CORS 활성화
+                // 2. CSRF 비활성화 : REST API에서는 CSRF 토큰을 사용하지 않으므로 비활성화
                 .csrf(cs -> cs.disable()) // 버전에 따라 방식 변경
+                // 3. 인가(Authorization) 설정 : 어떤 요청에 접근을 허용할지 정의
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 전부 허용
-//                        .requestMatchers(HttpMethod.POST,"/api/user/login","/api/user/signup").permitAll() // 로그인/인증 공개
-                        .anyRequest().permitAll() // 모든 요청 허용 -> authenticated() 인증필요
+                        // OPTIONS 메서드는 프리플라이트 요청이므로 전부 허용
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // 로그인 및 회언가입 경로는 인증 없이 접근을 허용
+                        .requestMatchers(HttpMethod.POST,"/api/user/login","/api/user/signup").permitAll() // 로그인/인증 공개
+                        // 그 외 모든 요청은 반드시 인증된 사용자만 접근할 수 있도록 설정
+                        .anyRequest().authenticated() // 모든 요청 허용 pemitAll() -> authenticated() 인증필요
                 );
-//                .formLogin(form -> form
-//                    .loginProcessingUrl("/login") // 로그인 요청을 처리할 URL
-//                        .permitAll()
-//                );
         return http.build();
     }
-
-//    @Bean
-//    public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
-//        FilterRegistrationBean<CorsFilter> registration = new FilterRegistrationBean<>();
-//        registration.setFilter(new CorsFilter(corsConfigurationSource()));
-//        registration.addUrlPatterns("/*"); // 모든 URL 패턴에 적용
-//        registration.setOrder(Ordered.HIGHEST_PRECEDENCE); // 가장 높은 우선순위
-//        return registration;
-//    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowCredentials(true); //쿠키/자격증명 포함 허용
-
-//        cfg.setAllowedOrigins(List.of("https://saymary.site"));
         cfg.setAllowedOriginPatterns(List.of(
                 "https://*.vercel.app",
                 "https://saymary.site",
