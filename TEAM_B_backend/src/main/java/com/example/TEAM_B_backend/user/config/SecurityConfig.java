@@ -34,7 +34,7 @@ public class SecurityConfig {
                                 "/api/user/login",
                                 "/api/user/signup",
                                 "/api/user/request-reset",
-                                "api/user/reset-password"
+                                "/api/user/reset-password"
                                 ).permitAll() // 로그인/인증 공개
                         // 그 외 모든 요청은 반드시 인증된 사용자만 접근할 수 있도록 설정
                         .anyRequest().authenticated() // 모든 요청 허용 pemitAll() -> authenticated() 인증필요
