@@ -28,20 +28,10 @@ public class SecurityConfig {
                 // 3. 인가(Authorization) 설정 : 어떤 요청에 접근을 허용할지 정의
                 .authorizeHttpRequests(auth -> auth
                         // OPTIONS 메서드는 프리플라이트 요청이므로 전부 허용
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/user/reset-password",
-                                "/api/user/me"
-                        ).permitAll()
-                        // 로그인 및 회언가입, 비밀번호 찾기 경로는 인증 없이 접근을 허용
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/user/login",
-                                "/api/user/signup",
-                                "/api/user/request-reset",
-                                "/api/user/reset-password"
-                        ).permitAll() // 로그인/인증 공개
-                        // 그 외 모든 요청은 반드시 인증된 사용자만 접근할 수 있도록 설정
-                        .anyRequest().authenticated() // 모든 요청 허용 pemitAll() -> authenticated() 인증필요
+//                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/user/me").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/user/logout").authenticated() // 로그인/인증 공개
+                        .anyRequest().permitAll()// 모든 요청 허용 pemitAll() -> authenticated() 인증필요
                 );
         return http.build();
     }
