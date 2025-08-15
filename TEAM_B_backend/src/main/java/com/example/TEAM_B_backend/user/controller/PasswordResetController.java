@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -44,10 +45,26 @@ public class PasswordResetController {
     private PasswordEncoder passwordEncoder;
 
     // 2. 토큰 검증 및 비밀번호 재설정
+    @GetMapping("/reset-password")
+    public RedirectView validateResetToken(@RequestParam String token) {
+        User user = userRepository.findByResetToken(token)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 토큰"));
+        if (user.getResetTokenExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("토큰 만료됨");
+        }
+
+        // 토큰 유효하면, 프론트엔드의 비밀번호 재설정 페이지로 리다이렉트
+        return new RedirectView("https://saymary.site/reset-password?token=" + token);
+    }
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> req) {
         String token = req.get("token");
         String newPassword = req.get("newPassword");
+
+        // newPassword가 null인지 검증하는 로직 추가
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("새 비밀번호를 입력해야 합니다.");
+        }
 
         User user = userRepository.findByResetToken(token)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 토큰"));

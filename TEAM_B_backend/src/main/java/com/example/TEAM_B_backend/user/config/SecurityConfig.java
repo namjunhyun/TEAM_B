@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // OPTIONS 메서드는 프리플라이트 요청이므로 전부 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/user/reset-password").permitAll()
                         // 로그인 및 회언가입, 비밀번호 찾기 경로는 인증 없이 접근을 허용
                         .requestMatchers(HttpMethod.POST,
                                 "/api/user/login",
