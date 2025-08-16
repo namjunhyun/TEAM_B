@@ -19,16 +19,16 @@ import java.io.File;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/fastapi")
-public class FastApiController {
+@RequestMapping("/api/spring")
+public class SttController {
 
     private final FastApiService fastApiService;
     private final TextFileService textFileService;
     private final UserRepository userRepository;
 
-    public FastApiController(FastApiService fastApiService,
-                             TextFileService textFileService,
-                             UserRepository userRepository) {
+    public SttController(FastApiService fastApiService,
+                         TextFileService textFileService,
+                         UserRepository userRepository) {
         this.fastApiService = fastApiService;
         this.textFileService = textFileService;
         this.userRepository = userRepository;
