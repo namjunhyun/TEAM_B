@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 @RestController
 @RequestMapping("/api/spring")
@@ -38,34 +39,43 @@ public class SttController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadAndCallFastApi(@RequestParam("file") MultipartFile multipartFile,
                                                   HttpServletRequest request) {
-        if (multipartFile.isEmpty()) {
+        if (multipartFile == null || multipartFile.isEmpty()) {
             return ResponseEntity.badRequest().body("파일이 비어 있습니다.");
         }
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            return ResponseEntity.status(401).body("로그인이 필요합니다.");
-        }
-
-        Long userId = (Long) session.getAttribute("userId");
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        File tempFile = null;
+        boolean saved = false;
 
         try {
             // MultipartFile을 임시 파일로 저장
-            File tempFile = File.createTempFile("upload-", multipartFile.getOriginalFilename());
+            String suffix = "";
+            String originalName = multipartFile.getOriginalFilename();
+            if (originalName != null && originalName.contains(".")) {
+                suffix = originalName.substring(originalName.lastIndexOf(".")); // 확장자 유지
+            }
+            tempFile = File.createTempFile("upload-", multipartFile.getOriginalFilename());
             multipartFile.transferTo(tempFile);
 
             // FastAPI API 호출 (DTO로 받기)
             TextFileDto responseDto = fastApiService.uploadAudioFileToFastApi(tempFile);
 
             // DB에 저장
-            textFileService.saveTextFile(multipartFile.getOriginalFilename(),
-                    responseDto.getTranscript(),
-                    responseDto.getSummary1(),
-                    responseDto.getSummary2(),
-                    responseDto.getSummary3(),
-                    user);
+            HttpSession session = request.getSession(false);
+            Long userId = (session != null) ? (Long) session.getAttribute("userId") : null;
+            User user = null;
+            if (userId != null) {
+                user = userRepository.findById(userId).orElse(null);
+            }
+            if (userId != null) {
+                textFileService.saveTextFile(multipartFile.getOriginalFilename(),
+                        responseDto.getTranscript(),
+                        responseDto.getSummary1(),
+                        responseDto.getSummary2(),
+                        responseDto.getSummary3(),
+                        user
+                );
+                saved = true;
+            }
 
             // 임시 파일 삭제
             tempFile.delete();
@@ -79,6 +89,13 @@ public class SttController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("FastAPI 요청 실패: " + e.getMessage());
+        } finally {
+            if (tempFile != null) {
+                try {
+                    Files.deleteIfExists(tempFile.toPath());
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 
