@@ -6,12 +6,20 @@ import com.example.TEAM_B_backend.user.entity.User;
 import com.example.TEAM_B_backend.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +43,7 @@ public class UserController {
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDto dto, HttpServletRequest request) {
+    public ResponseEntity<String> login(@RequestBody LoginRequestDto dto, HttpServletRequest request, HttpServletResponse response) {
         // ✅ 디버깅용 로그 출력
         System.out.println("💬 로그인 요청됨");
         System.out.println("💬 이메일: " + dto.getEmail());
@@ -54,6 +62,17 @@ public class UserController {
             } else {
                 session.setMaxInactiveInterval(60 * 60); // 1시간
             }
+
+            // 스프링 시큐리티 인증 컨텍스트 구성
+            var authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+            var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authentication);
+            SecurityContextHolder.setContext(context);
+
+            // 세션에 SecurityContext 저장
+            new HttpSessionSecurityContextRepository().saveContext(context, request, response);
             return ResponseEntity.ok("로그인 성공");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(401).body(e.getMessage());
@@ -75,15 +94,18 @@ public class UserController {
     // 로그인 상태 확인
     @GetMapping("/me")
     public ResponseEntity<String> getLoginUser(HttpServletRequest request) {
-        try {
-            HttpSession session = request.getSession(false);
-            if (session == null || session.getAttribute("userId") == null) {
-                return ResponseEntity.status(401).body("로그인되지 않음");
-            }
-            String nickname = (String) session.getAttribute("nickname");
-            return ResponseEntity.ok("로그인 중: nickname=" + nickname);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("서버 오류가 발생했습니다.");
-        }
+//        try {
+//            HttpSession session = request.getSession(false);
+//            if (session == null || session.getAttribute("userId") == null) {
+//                return ResponseEntity.status(401).body("로그인되지 않음");
+//            }
+//            String nickname = (String) session.getAttribute("nickname");
+//            return ResponseEntity.ok("로그인 중: nickname=" + nickname);
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body("서버 오류가 발생했습니다.");
+//        }
+        String nickname = (String) request.getSession().getAttribute("nickname");
+        return ResponseEntity.ok("로그인 중: nickname=" + nickname);
     }
+
 }
